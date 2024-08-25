@@ -11,7 +11,7 @@ type UpdateUserProps = {
 
 class UsersService {
   public async getUsers(): Promise<IUser[]> {
-    const users = await User.find().exec();
+    const users = await User.find({ roleId: 2 }).exec();
     return users;
   }
 

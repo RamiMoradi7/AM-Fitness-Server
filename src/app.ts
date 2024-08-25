@@ -17,7 +17,7 @@ const app = express();
 
 // CORS configuration
 const corsOptions = {
-  origin: "https://am-fitness.onrender.com", // Your frontend URL
+  origin: ["https://am-fitness.onrender.com"], // Your frontend URL
   credentials: true, // Allow credentials (cookies, authorization headers, etc.)
 };
 

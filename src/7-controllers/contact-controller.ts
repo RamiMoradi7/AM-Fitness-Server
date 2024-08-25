@@ -14,6 +14,7 @@ class ContactController {
   // Register routes:
   private registerRoutes(): void {
     this.router.post("/contact-us/", this.handleContact);
+    this.router.get("/contacts", this.getContacts);
   }
 
   private async handleContact(
@@ -27,6 +28,18 @@ class ContactController {
       response
         .status(StatusCode.OK)
         .json({ success: "Form has been submitted successfully." });
+    } catch (err: any) {
+      next(err);
+    }
+  }
+  private async getContacts(
+    request: Request,
+    response: Response,
+    next: NextFunction
+  ): Promise<void> {
+    try {
+      const contacts = await contactService.getContacts();
+      response.json(contacts);
     } catch (err: any) {
       next(err);
     }

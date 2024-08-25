@@ -49,7 +49,6 @@ export const UserSchema = new Schema<IUser>(
     },
     birthday: {
       type: Date,
-      required: [true, "Birthday is missing."],
     },
     age: {
       type: Number,
@@ -94,7 +93,7 @@ export const UserSchema = new Schema<IUser>(
   }
 );
 
-function calculateAge(birthday: Date): number {
+function calculateAge(birthday?: Date): number {
   const today = new Date();
   let age = today.getFullYear() - birthday.getFullYear();
   const monthDifference = today.getMonth() - birthday.getMonth();
