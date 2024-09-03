@@ -31,14 +31,18 @@ class AuthService {
     const user = await User.findOne({
       email: credentials.email.toLowerCase(),
       password: credentials.password,
-    }).exec();
+    })
+    .exec();
     if (!user) {
       throw new ValidationError("אחד מהפרטים שהזנת שגויים.");
     }
     user.isActive = true;
     user.lastLogin = new Date();
     await user.save();
-    const token = cyber.getNewToken(user);
+    const token = cyber.getNewToken({
+      _id: user._id,
+      roleId: user.roleId,
+    });
     return token;
   }
 

@@ -5,20 +5,11 @@ import { IUser } from "../4-models/user";
 import { RoleModel } from "../4-models/enums";
 
 class Cyber {
-  public getNewToken(user: IUser): string {
-    // Remove password from user:
+  public getNewToken(user: Partial<IUser>): string {
     delete user.password;
-
-    // Create container object containing the user:
     const container = { user };
-
-    // Create options:
-    const options: SignOptions = { expiresIn: "5h" };
-
-    // Create token:
+    const options: SignOptions = { expiresIn: "2h" };
     const token = jwt.sign(container, appConfig.jwtSecretKey, options);
-
-    // Return:
     return token;
   }
 

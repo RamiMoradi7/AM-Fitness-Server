@@ -11,13 +11,16 @@ import { loggerMiddleware } from "./5-middleware/logger-middleware";
 import { authRouter } from "./7-controllers/auth-controller";
 import { contactRouter } from "./7-controllers/contact-controller";
 import { usersRouter } from "./7-controllers/users-controller";
+import { exercisesRouter } from "./7-controllers/exercises-controller";
+import { trainingPlansRouter } from "./7-controllers/training-plans-controller";
+import { fitnessDataRouter } from "./7-controllers/fitness-data-controller";
 
 // Create Express application
 const app = express();
 
 // CORS configuration
 const corsOptions = {
-  origin: ["https://am-fitness.onrender.com"], // Your frontend URL
+  origin: ["https://am-fitness.onrender.com", "http://localhost:3000"], // Your frontend URL
   credentials: true, // Allow credentials (cookies, authorization headers, etc.)
 };
 
@@ -36,7 +39,15 @@ app.use(loggerMiddleware.logToConsole);
 fileSaver.config(path.join(__dirname, "1-assets", "images"));
 
 // Route setup
-app.use("/api", usersRouter, contactRouter, authRouter);
+app.use(
+  "/api",
+  usersRouter,
+  contactRouter,
+  authRouter,
+  exercisesRouter,
+  trainingPlansRouter,
+  fitnessDataRouter
+);
 
 // Error handling middlewares
 app.use(errorsMiddleware.routeNotFound);

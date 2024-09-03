@@ -16,7 +16,15 @@ class UsersService {
   }
 
   public async getUser(userId: string): Promise<IUser> {
-    const user = await User.findById(userId).exec();
+    const user = await User.findById(userId)
+      .populate({
+        path: "trainingPlans",
+        populate: {
+          path: "days.exercises",
+          model: "Exercise",
+        },
+      })
+      .exec();
     if (!user) throw new ResourceNotFoundError(userId);
     return user;
   }
@@ -35,7 +43,7 @@ class UsersService {
 
     const updatedUser = await User.findByIdAndUpdate(
       userId,
-      { fields },
+      { fields, photo: user.photo },
       { new: true }
     );
     if (!updatedUser) throw new ResourceNotFoundError(userId);

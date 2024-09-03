@@ -20,7 +20,6 @@ export interface IUser extends Document {
   updatedAt?: Date;
   roleId: RoleModel;
   trainingPlans?: Schema.Types.ObjectId[];
-  dietaryMenus?: Schema.Types.ObjectId[];
   resetToken?: string;
   resetTokenExpires?: number;
 }
@@ -78,6 +77,7 @@ export const UserSchema = new Schema<IUser>(
     },
     resetToken: { type: String },
     resetTokenExpires: { type: Number },
+    trainingPlans: [{ type: Schema.Types.ObjectId, ref: "TrainingPlan" }],
   },
   {
     versionKey: false,

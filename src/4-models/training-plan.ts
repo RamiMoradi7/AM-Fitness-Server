@@ -1,27 +1,31 @@
 import { Document, Schema, model } from "mongoose";
+import { IExercise } from "./exercise";
 
-interface IExercize {
-  name: string;
-  sets: number;
-  reps: number;
-  rest: number;
+interface IDay {
+  dayOfWeek: string;
+  exercises: IExercise;
 }
 
 export interface ITrainingPlan extends Document {
   user: Schema.Types.ObjectId;
   name: string;
-  description: string;
-  exercizes: IExercize[];
+  description?: string;
+  days: IDay[];
   duration: number;
+  goal?: string;
   createdAt?: Date;
   updatedAt?: Date;
 }
 
-const ExercizeSchema = new Schema<IExercize>({
-  name: { type: String, required: true },
-  sets: { type: Number, required: true },
-  reps: { type: Number, required: true },
-  rest: { type: Number, required: true },
+const DaySchema = new Schema<IDay>({
+  dayOfWeek: { type: String, required: [true, "Day of week is required"] },
+  exercises: [
+    {
+      type: Schema.Types.ObjectId,
+      ref: "Exercise",
+      required: [true, "Exercise id is missing."],
+    },
+  ],
 });
 
 const TrainingPlanSchema = new Schema<ITrainingPlan>(
@@ -31,12 +35,16 @@ const TrainingPlanSchema = new Schema<ITrainingPlan>(
       required: [true, "User is missing."],
       ref: "User",
     },
-    name: { type: String, required: [true, "Training plan name is missing."] },
-    description: { type: String, required: [true, "Description is missing."] },
-    exercizes: [ExercizeSchema],
+    name: { type: String },
+    description: { type: String },
+    days: {
+      type: [DaySchema],
+      required: [true, "Training plan days are missing."],
+    },
     duration: { type: Number, required: [true, "Duration is missing."] },
+    goal: { type: String },
   },
-  { timestamps: true, id: false }
+  { timestamps: true, id: false, versionKey: false }
 );
 
 export const TrainingPlan = model<ITrainingPlan>(

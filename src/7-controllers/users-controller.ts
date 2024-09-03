@@ -2,6 +2,7 @@ import express, { NextFunction, Request, Response } from "express";
 import { usersService } from "../6-services/users-service";
 import { UploadedFile } from "express-fileupload";
 import { StatusCode } from "../4-models/enums";
+import { fileSaver } from "uploaded-file-saver";
 
 class UsersController {
   public readonly router = express.Router();
@@ -18,7 +19,7 @@ class UsersController {
     this.router.get("/users/:_id", this.getUser);
     this.router.put("/users/:_id", this.updateUser);
     this.router.delete("/users/:_id", this.deleteUser);
-    this.router.post("/fetch-metadata");
+    this.router.get("/AMFitness/customer-image/:imageName", this.getImageFile);
   }
   // Get CSRF Token
   private async getCsrfToken(
@@ -65,7 +66,10 @@ class UsersController {
     try {
       const userId = request.params._id;
       const { fields } = request.body;
-      const image = (request.files.image as UploadedFile) || null;
+      const image =
+        request.files && request.files.image
+          ? (request.files.image as UploadedFile)
+          : undefined;
       const updatedUser = await usersService.updateUser({
         userId,
         fields,
@@ -85,6 +89,19 @@ class UsersController {
       const userId = request.params._id;
       await usersService.deleteUser(userId);
       response.sendStatus(StatusCode.NoContent);
+    } catch (err: any) {
+      next(err);
+    }
+  }
+  private async getImageFile(
+    request: Request,
+    response: Response,
+    next: NextFunction
+  ): Promise<void> {
+    try {
+      const imageName = request.params.imageName;
+      const imagePath = await fileSaver.getFilePath(imageName);
+      response.sendFile(imagePath);
     } catch (err: any) {
       next(err);
     }
