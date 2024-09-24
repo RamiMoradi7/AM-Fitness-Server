@@ -1,32 +1,15 @@
-import { Document, Schema, model } from "mongoose";
-import { IExercise } from "./exercise";
-
-interface IDay {
-  dayOfWeek: string;
-  exercises: IExercise;
-}
+import mongoose, { Document, Schema, model } from "mongoose";
 
 export interface ITrainingPlan extends Document {
   user: Schema.Types.ObjectId;
   name: string;
   description?: string;
-  days: IDay[];
-  duration: number;
+  weeks: mongoose.Types.ObjectId[];
+  durationInMonths: number;
   goal?: string;
   createdAt?: Date;
   updatedAt?: Date;
 }
-
-const DaySchema = new Schema<IDay>({
-  dayOfWeek: { type: String, required: [true, "Day of week is required"] },
-  exercises: [
-    {
-      type: Schema.Types.ObjectId,
-      ref: "Exercise",
-      required: [true, "Exercise id is missing."],
-    },
-  ],
-});
 
 const TrainingPlanSchema = new Schema<ITrainingPlan>(
   {
@@ -37,11 +20,16 @@ const TrainingPlanSchema = new Schema<ITrainingPlan>(
     },
     name: { type: String },
     description: { type: String },
-    days: {
-      type: [DaySchema],
-      required: [true, "Training plan days are missing."],
+    durationInMonths: {
+      type: Number,
+      required: [true, "Duration is missing."],
     },
-    duration: { type: Number, required: [true, "Duration is missing."] },
+    weeks: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: "Week",
+      },
+    ],
     goal: { type: String },
   },
   { timestamps: true, id: false, versionKey: false }

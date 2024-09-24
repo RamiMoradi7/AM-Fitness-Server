@@ -3,6 +3,7 @@ import { usersService } from "../6-services/users-service";
 import { UploadedFile } from "express-fileupload";
 import { StatusCode } from "../4-models/enums";
 import { fileSaver } from "uploaded-file-saver";
+import { IUser } from "../4-models/user";
 
 class UsersController {
   public readonly router = express.Router();
@@ -19,7 +20,6 @@ class UsersController {
     this.router.get("/users/:_id", this.getUser);
     this.router.put("/users/:_id", this.updateUser);
     this.router.delete("/users/:_id", this.deleteUser);
-    this.router.get("/AMFitness/customer-image/:imageName", this.getImageFile);
   }
   // Get CSRF Token
   private async getCsrfToken(
@@ -65,7 +65,7 @@ class UsersController {
   ): Promise<void> {
     try {
       const userId = request.params._id;
-      const { fields } = request.body;
+      const fields = request.body as IUser;
       const image =
         request.files && request.files.image
           ? (request.files.image as UploadedFile)
@@ -89,19 +89,6 @@ class UsersController {
       const userId = request.params._id;
       await usersService.deleteUser(userId);
       response.sendStatus(StatusCode.NoContent);
-    } catch (err: any) {
-      next(err);
-    }
-  }
-  private async getImageFile(
-    request: Request,
-    response: Response,
-    next: NextFunction
-  ): Promise<void> {
-    try {
-      const imageName = request.params.imageName;
-      const imagePath = await fileSaver.getFilePath(imageName);
-      response.sendFile(imagePath);
     } catch (err: any) {
       next(err);
     }

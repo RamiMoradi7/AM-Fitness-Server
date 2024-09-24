@@ -14,6 +14,9 @@ import { usersRouter } from "./7-controllers/users-controller";
 import { exercisesRouter } from "./7-controllers/exercises-controller";
 import { trainingPlansRouter } from "./7-controllers/training-plans-controller";
 import { fitnessDataRouter } from "./7-controllers/fitness-data-controller";
+import cookieParser from "cookie-parser";
+import { csrfProtection, setCsrfTokenHeader } from "./3-config/security";
+import helmet from "helmet";
 
 // Create Express application
 const app = express();
@@ -24,13 +27,24 @@ const corsOptions = {
   credentials: true, // Allow credentials (cookies, authorization headers, etc.)
 };
 
+app.get("/api/AMFitness/customer-image/:imageName", (req, res) => {
+  res.setHeader("Access-Control-Allow-Origin", "*"); // Adjust as necessary
+  try {
+    const imageName = req.params.imageName;
+    const imagePath = fileSaver.getFilePath(imageName);
+    res.sendFile(imagePath);
+  } catch (err: any) {
+    console.log(err);
+  }
+});
+
 // Middleware setup
 app.use(cors(corsOptions));
 app.use(express.json());
-// app.use(cookieParser());
-// app.use(csrfProtection); // Apply CSRF protection
-// app.use(setCsrfTokenHeader); // Add CSRF token to headers
-// app.use(helmet()); // Adds security-related headers
+app.use(cookieParser());
+app.use(csrfProtection); // Apply CSRF protection
+app.use(setCsrfTokenHeader); // Add CSRF token to headers
+app.use(helmet()); // Adds security-related headers
 app.use(rateLimiter); // Apply rate limiting
 app.use(expressFileUpload()); // File upload middleware
 app.use(loggerMiddleware.logToConsole);

@@ -1,3 +1,4 @@
+import mongoose from "mongoose";
 import {
   ResourceNotFoundError,
   ValidationError,
@@ -14,9 +15,7 @@ class FitnessDataService {
   ): Promise<IWeeklyFitnessData | null> {
     const recentWeeklyData = await WeeklyFitnessData.findOne({
       userId,
-    })
-      .sort({ weekStartDate: -1 })
-      .exec();
+    }).exec();
 
     if (!recentWeeklyData) throw new ResourceNotFoundError(userId);
     return recentWeeklyData;
@@ -58,34 +57,64 @@ class FitnessDataService {
     return addedWeeklyData;
   }
 
-  public async updateWeeklyData(
-    weekStartDate: Date,
-    userId: string,
-    dailyData: IDailyData[]
-  ): Promise<IWeeklyFitnessData | null> {
+  public async calculateWeeklyData(
+    weeklyFitnessId: string
+  ): Promise<IWeeklyFitnessData> {
+    const weeklyFitnessData = await WeeklyFitnessData.findOne({
+      _id: weeklyFitnessId,
+    }).exec();
+
+    if (!weeklyFitnessData) throw new ResourceNotFoundError(weeklyFitnessId);
+    const { dailyData } = weeklyFitnessData;
+
+    const validDays = dailyData.filter((day) => day.weight > 0);
+
     const totalCalories = dailyData.reduce((sum, day) => sum + day.calories, 0);
     const totalProtein = dailyData.reduce((sum, day) => sum + day.protein, 0);
-    const averageWeight =
-      dailyData.reduce((sum, day) => sum + day.weight, 0) / dailyData.length;
-    const totalSteps = dailyData.reduce((sum, day) => sum + day.steps, 0);
+    const averageWeight = validDays.length
+      ? validDays.reduce((sum, day) => sum + day.weight, 0) / validDays.length
+      : 0;
 
-    const updatedData = await WeeklyFitnessData.findOneAndUpdate(
-      { userId, weekStartDate },
+    const totalSteps = dailyData.reduce((sum, day) => sum + day.steps, 0);
+    weeklyFitnessData.totalCalories = totalCalories;
+    weeklyFitnessData.totalProtein = totalProtein;
+    weeklyFitnessData.averageWeight = averageWeight;
+    weeklyFitnessData.totalSteps = totalSteps;
+
+    await weeklyFitnessData.save();
+    return weeklyFitnessData;
+  }
+
+  public async updateDailyData(
+    weeklyFitnessId: string,
+    dayId: string,
+    fields: Partial<IDailyData>
+  ): Promise<IDailyData | null> {
+    const updatedDay = await WeeklyFitnessData.findOneAndUpdate(
       {
-        dailyData,
-        totalCalories,
-        totalProtein,
-        averageWeight,
-        totalSteps,
+        _id: weeklyFitnessId,
+        "dailyData._id": dayId,
+      },
+      {
+        $set: {
+          ...(fields.calories && { "dailyData.$.calories": fields.calories }),
+          ...(fields.protein && { "dailyData.$.protein": fields.protein }),
+          ...(fields.weight && { "dailyData.$.weight": fields.weight }),
+          ...(fields.steps && { "dailyData.$.steps": fields.steps }),
+        },
       },
       { new: true }
-    );
+    ).exec();
 
-    if (!updatedData) {
-      throw new Error("Weekly data not found or update failed.");
+    if (!updatedDay || !updatedDay.dailyData.length) {
+      throw new ResourceNotFoundError(dayId);
     }
 
-    return updatedData;
+    const updatedDayData = updatedDay.dailyData.find(
+      (data) => data._id.toString() === dayId
+    );
+
+    return updatedDayData || null;
   }
 }
 
