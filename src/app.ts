@@ -23,7 +23,7 @@ const app = express();
 
 // CORS configuration
 const corsOptions = {
-  origin: ["https://am-fitness.onrender.com", "http://localhost:3000"], // Your frontend URL
+  origin: ["https://am-fitness.onrender.com", "http://localhost:3000"],
   credentials: true, // Allow credentials (cookies, authorization headers, etc.)
 };
 
@@ -49,6 +49,14 @@ app.use(rateLimiter); // Apply rate limiting
 app.use(expressFileUpload()); // File upload middleware
 app.use(loggerMiddleware.logToConsole);
 
+app.use((req, res, next) => {
+  res.cookie("csrfToken", req.csrfToken(), {
+    httpOnly: true,
+    secure: true, // Ensure the cookie is sent only over HTTPS
+    sameSite: "none",
+  });
+  next();
+});
 // Configure fileSaver
 fileSaver.config(path.join(__dirname, "1-assets", "images"));
 
@@ -74,6 +82,5 @@ const start = async () => {
     console.log(`Listening on http://localhost:${appConfig.port}`);
   });
 };
-
 // Start the server
 start();
