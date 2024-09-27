@@ -49,14 +49,6 @@ app.use(rateLimiter); // Apply rate limiting
 app.use(expressFileUpload()); // File upload middleware
 app.use(loggerMiddleware.logToConsole);
 
-app.use((req, res, next) => {
-  res.cookie("csrfToken", req.csrfToken(), {
-    httpOnly: true,
-    secure: true, // Ensure the cookie is sent only over HTTPS
-    sameSite: "none",
-  });
-  next();
-});
 // Configure fileSaver
 fileSaver.config(path.join(__dirname, "1-assets", "images"));
 

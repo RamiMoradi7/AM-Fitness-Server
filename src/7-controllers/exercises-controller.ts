@@ -2,6 +2,7 @@ import express, { NextFunction, Request, Response } from "express";
 import { StatusCode } from "../4-models/enums";
 import { Exercise } from "../4-models/exercise";
 import { exercisesService } from "../6-services/exercises-service";
+import { securityMiddleware } from "../5-middleware/security-middleware";
 
 class ExercisesController {
   public readonly router = express.Router();
@@ -14,9 +15,21 @@ class ExercisesController {
   // Register routes:
   private registerRoutes(): void {
     this.router.get("/exercises/", this.getExercises);
-    this.router.get("/exercises/:_id", this.getExercise);
-    this.router.post("/exercises/", this.addExercise);
-    this.router.put("/exercises/:_id", this.updateExercise);
+    this.router.get(
+      "/exercises/:_id",
+      securityMiddleware.verifyLoggedIn,
+      this.getExercise
+    );
+    this.router.post(
+      "/exercises/",
+      securityMiddleware.verifyAdmin,
+      this.addExercise
+    );
+    this.router.put(
+      "/exercises/:_id",
+      securityMiddleware.verifyAdmin,
+      this.updateExercise
+    );
     this.router.get("/exercises/category/:name", this.getExercisesByCategory);
   }
 

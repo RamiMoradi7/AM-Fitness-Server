@@ -1,8 +1,9 @@
 import express, { NextFunction, Request, Response } from "express";
 import { StatusCode } from "../4-models/enums";
 import { ITrainingPlan, TrainingPlan } from "../4-models/training-plan";
-import { trainingPlansService } from "../6-services/training-plans-service";
 import { ISet, IWeek } from "../4-models/week";
+import { trainingPlansService } from "../6-services/training-plans-service";
+import { securityMiddleware } from "../5-middleware/security-middleware";
 
 class TrainingPlansController {
   public readonly router = express.Router();
@@ -16,16 +17,41 @@ class TrainingPlansController {
   private registerRoutes(): void {
     this.router.get("/training-plans/:_id", this.getTrainingPlan);
     this.router.get("/training-plans/week/:weekId", this.getPlanWeek);
-    this.router.post("/training-plans/date-range", this.getPlanByDateRange);
+    this.router.post(
+      "/training-plans/date-range",
+      securityMiddleware.verifyLoggedIn,
+      this.getPlanByDateRange
+    );
     this.router.get(
       "/training-plans/current/user/:_id",
+      securityMiddleware.verifyLoggedIn,
       this.getCurrentWeeklyData
     );
-    this.router.post("/training-plans/", this.addTrainingPlan);
-    this.router.put("/training-plans/:_id", this.editTrainingPlan);
-    this.router.put("/week/:weekId/set-details/:_id", this.editSetDetails);
-    this.router.put("/training-plans/week/:weekId/", this.editPlanWeek);
-    this.router.delete("/training-plans/:_id", this.deleteTrainingPlan);
+    this.router.post(
+      "/training-plans/",
+      securityMiddleware.verifyAdmin,
+      this.addTrainingPlan
+    );
+    this.router.put(
+      "/training-plans/:_id",
+      securityMiddleware.verifyAdmin,
+      this.editTrainingPlan
+    );
+    this.router.put(
+      "/week/:weekId/set-details/:_id",
+      securityMiddleware.verifyLoggedIn,
+      this.editSetDetails
+    );
+    this.router.put(
+      "/training-plans/week/:weekId/",
+      securityMiddleware.verifyLoggedIn,
+      this.editPlanWeek
+    );
+    this.router.delete(
+      "/training-plans/:_id",
+      securityMiddleware.verifyAdmin,
+      this.deleteTrainingPlan
+    );
   }
 
   private async getTrainingPlan(

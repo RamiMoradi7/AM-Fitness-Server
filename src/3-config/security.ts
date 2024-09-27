@@ -17,8 +17,9 @@ export const setCsrfTokenHeader = (
   next: NextFunction
 ) => {
   if (req.csrfToken) {
-    res.setHeader("X-CSRF-Token", req.csrfToken());
-    console.log({ token: req.csrfToken() });
+    const csrfToken = req.csrfToken();
+    res.setHeader("X-CSRF-Token", csrfToken);
+    console.log({ token: csrfToken });
   }
   next();
 };
