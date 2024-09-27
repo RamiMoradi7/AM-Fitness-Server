@@ -4,7 +4,11 @@ import { NextFunction, Request, Response, RequestHandler } from "express";
 
 // Initialize CSRF protection with cookie options
 export const csrfProtection: RequestHandler = csurf({
-  cookie: { httpOnly: true, secure: process.env.NODE_ENV === "production" },
+  cookie: {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: process.env.NODE_ENV === "production" ? "none" : "lax", // Allow cross-site cookies in production
+  },
 });
 
 export const securityMiddleware: RequestHandler[] = [helmet(), csrfProtection];
