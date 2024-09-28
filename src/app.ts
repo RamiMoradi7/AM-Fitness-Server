@@ -27,16 +27,16 @@ const corsOptions = {
   credentials: true, // Allow credentials (cookies, authorization headers, etc.)
 };
 
-app.get("/api/AMFitness/customer-image/:imageName", (req, res) => {
-  res.setHeader("Access-Control-Allow-Origin", "*"); // Adjust as necessary
-  try {
-    const imageName = req.params.imageName;
-    const imagePath = fileSaver.getFilePath(imageName);
-    res.sendFile(imagePath);
-  } catch (err: any) {
-    console.log(err);
-  }
-});
+// app.get("/api/AMFitness/customer-image/:imageName", (req, res) => {
+//   res.setHeader("Access-Control-Allow-Origin", "*"); // Adjust as necessary
+//   try {
+//     const imageName = req.params.imageName;
+//     const imagePath = fileSaver.getFilePath(imageName);
+//     res.sendFile(imagePath);
+//   } catch (err: any) {
+//     console.log(err);
+//   }
+// });
 
 // Middleware setup
 app.use(cors(corsOptions));

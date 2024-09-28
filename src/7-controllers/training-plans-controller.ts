@@ -23,7 +23,7 @@ class TrainingPlansController {
       this.getPlanByDateRange
     );
     this.router.get(
-      "/training-plans/current/user/:_id",
+      "/training-plans/current/user/:_id/trainingPlan/:planId",
       securityMiddleware.verifyLoggedIn,
       this.getCurrentWeeklyData
     );
@@ -95,10 +95,11 @@ class TrainingPlansController {
     next: NextFunction
   ): Promise<void> {
     try {
-      const { startDate, endDate, userId } = request.body.data;
+      const { startDate, endDate, userId, planId } = request.body.data;
 
       const week = await trainingPlansService.getPlanWeekByDateRange(
         userId,
+        planId,
         new Date(startDate),
         new Date(endDate)
       );
@@ -114,9 +115,9 @@ class TrainingPlansController {
     next: NextFunction
   ): Promise<void> {
     try {
-      const { _id } = request.params;
+      const { _id, planId } = request.params;
 
-      const week = await trainingPlansService.getCurrentWeeklyData(_id);
+      const week = await trainingPlansService.getCurrentWeeklyData(_id, planId);
       response.json(week);
     } catch (err: any) {
       next(err);

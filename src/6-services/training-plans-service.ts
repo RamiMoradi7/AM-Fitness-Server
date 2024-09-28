@@ -70,11 +70,13 @@ class TrainingPlansService {
 
   public async getPlanWeekByDateRange(
     userId: string,
+    trainingPlanId: string,
     startDate: Date,
     endDate: Date
   ): Promise<IWeek> {
     const week = await Week.findOne({
       userId,
+      trainingPlan: trainingPlanId,
       startDate: {
         $lte: endDate,
       },
@@ -97,9 +99,13 @@ class TrainingPlansService {
     return week;
   }
 
-  public async getCurrentWeeklyData(userId: string): Promise<IWeek> {
+  public async getCurrentWeeklyData(
+    userId: string,
+    planId: string
+  ): Promise<IWeek> {
     const currentDate = new Date();
     const week = await Week.findOne({
+      trainingPlan: planId,
       userId,
       startDate: { $lte: currentDate },
       endDate: { $gte: currentDate },
