@@ -7,7 +7,7 @@ export const csrfProtection: RequestHandler = csurf({
   cookie: {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
-    sameSite: "none",
+    sameSite: "lax",
   },
 });
 

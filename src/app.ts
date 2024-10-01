@@ -41,10 +41,10 @@ app.get("/api/AMFitness/customer-image/:imageName", (req, res) => {
 // Middleware setup
 app.use(cors(corsOptions));
 app.use(express.json());
-app.use(cookieParser());
-app.use(csrfProtection); // Apply CSRF protection
-app.use(setCsrfTokenHeader); // Add CSRF token to headers
-app.use(helmet()); // Adds security-related headers
+// app.use(cookieParser());
+// app.use(csrfProtection); // Apply CSRF protection
+// app.use(setCsrfTokenHeader); // Add CSRF token to headers
+// app.use(helmet()); // Adds security-related headers
 app.use(rateLimiter); // Apply rate limiting
 app.use(expressFileUpload()); // File upload middleware
 app.use(loggerMiddleware.logToConsole);

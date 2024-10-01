@@ -104,6 +104,7 @@ class TrainingPlansService {
     planId: string
   ): Promise<IWeek> {
     const currentDate = new Date();
+    currentDate.setHours(0, 0, 0, 0);
     const week = await Week.findOne({
       trainingPlan: planId,
       userId,
@@ -319,11 +320,17 @@ class TrainingPlansService {
     if (!updatedWeek) {
       throw new Error("Week not found.");
     }
+    console.log(
+      updatedWeek.days
+        .flatMap((day) => day.exercises)
+        .flatMap((exercise) => exercise.setDetails)
+        .find((set) => set._id.toString() === setObjectId.toString())
+    );
 
     const updatedSet = updatedWeek.days
       .flatMap((day) => day.exercises)
       .flatMap((exercise) => exercise.setDetails)
-      .find((set) => set._id?.toString() === setObjectId.toString());
+      .find((set) => set._id.toString() === setObjectId.toString());
 
     if (!updatedSet) {
       throw new Error("Updated set details not found.");
